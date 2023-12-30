@@ -51,7 +51,7 @@ func initDB() {
 }
 
 func handleCotacao(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5000*time.Millisecond)
+	ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
 	defer cancel()
 
 	select {
@@ -120,6 +120,12 @@ func saveCotacao(ctx context.Context, cotacao string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Millisecond)
 	defer cancel()
 
-	_, err := db.ExecContext(ctx, insertCotacaoSQL, cotacao)
+	stmt, err := db.Prepare(insertCotacaoSQL)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.ExecContext(ctx, cotacao)
 	return err
 }
