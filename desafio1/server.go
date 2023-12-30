@@ -19,9 +19,9 @@ type CotacaoResponse struct {
 }
 
 const (
-	dbFileName       = "cotacoes.db"
-	createTableSQL   = `CREATE TABLE IF NOT EXISTS cotacoes (id INTEGER PRIMARY KEY AUTOINCREMENT, bid TEXT, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP);`
-	insertCotacaoSQL = "INSERT INTO cotacoes (bid) VALUES (?);"
+	dbFileName       string = "cotacoes.db"
+	createTableSQL   string = `CREATE TABLE IF NOT EXISTS cotacoes (id INTEGER PRIMARY KEY AUTOINCREMENT, bid TEXT, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP);`
+	insertCotacaoSQL string = "INSERT INTO cotacoes (bid) VALUES (?);"
 )
 
 var db *sql.DB
@@ -39,19 +39,19 @@ func initDB() {
 
 	db, err = sql.Open("sqlite3", dbFileName)
 	if err != nil {
-		log.Fatal("[ERROR]", "Erro ao abrir banco de dados:", err)
+		log.Fatal("[ERROR]", "Erro ao abrir banco de dados:", err.Error())
 	}
 
 	_, err = db.Exec(createTableSQL)
 	if err != nil {
-		log.Fatal("[ERROR]", "Erro ao criar tabela no banco de dados:", err)
+		log.Fatal("[ERROR]", "Erro ao criar tabela no banco de dados:", err.Error())
 	}
 
 	log.Println("[INFO]", "Banco de dados inicializado")
 }
 
 func handleCotacao(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
+	ctx, cancel := context.WithTimeout(context.Background(), 5000*time.Millisecond)
 	defer cancel()
 
 	select {
@@ -71,7 +71,7 @@ func handleCotacao(w http.ResponseWriter, r *http.Request) {
 
 	err = saveCotacao(ctx, cotacao)
 	if err != nil {
-		log.Println("[ERROR]", "Erro ao salvar cotação no banco de dados:", err)
+		log.Println("[ERROR]", "Erro ao salvar cotação no banco de dados:", err.Error())
 		http.Error(w, "Erro ao salvar cotação no banco de dados", http.StatusInternalServerError)
 		return
 	}
