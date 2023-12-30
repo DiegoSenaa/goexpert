@@ -1,4 +1,4 @@
-module desafio1
+module github.com/DiegoSenaa/goexpert
 
 go 1.21.5
 
